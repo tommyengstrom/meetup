@@ -12,9 +12,6 @@ newtype TestMonad a = TestMonad (Reader UTCTime a)
 instance MonadTime TestMonad where
     getTime = ask
 
-instance MonadLog TestMonad where
-    logInfo _ = return ()
-
 instance MonadDB TestMonad where
     getTask _ = return "Test task"
 
