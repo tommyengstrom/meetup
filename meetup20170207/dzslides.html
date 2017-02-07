@@ -181,7 +181,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <section class="slide level3">
 
 <figure>
-<img src="wordmark.svg" alt="Henry" /><figcaption>Henry</figcaption>
+<img src="wordmark.svg" alt="Henry" style="background-color:white;" /><figcaption></figcaption>
 </figure>
 </section>
 <section id="writing-testable-code" class="titleslide slide level2"><h2>Writing testable code</h2></section><section class="slide level3">
@@ -680,7 +680,7 @@ runTest time (<span class="dt">TestMonad</span> m) <span class="fu">=</span>
       requestFullscreen.apply(html);
     }
   }
-  
+
   Dz.setProgress = function(aIdx, aStep) {
     var slide = $("section:nth-of-type("+ aIdx +")");
     if (!slide)
@@ -690,14 +690,14 @@ runTest time (<span class="dt">TestMonad</span> m) <span class="fu">=</span>
         stepSize = slideSize / steps;
     this.progressBar.style.width = ((aIdx - 1) * slideSize + aStep * stepSize) + '%';
   }
-  
+
   Dz.postMsg = function(aWin, aMsg) { // [arg0, [arg1...]]
     aMsg = [aMsg];
     for (var i = 2; i < arguments.length; i++)
       aMsg.push(encodeURIComponent(arguments[i]));
     aWin.postMessage(aMsg.join(" "), "*");
   }
-  
+
   function init() {
     Dz.init();
     window.onkeydown = Dz.onkeydown.bind(Dz);
@@ -715,7 +715,7 @@ runTest time (<span class="dt">TestMonad</span> m) <span class="fu">=</span>
     Function.prototype.bind = function (oThis) {
 
       // closest thing possible to the ECMAScript 5 internal IsCallable
-      // function 
+      // function
       if (typeof this !== "function")
       throw new TypeError(
         "Function.prototype.bind - what is trying to be fBound is not callable"
