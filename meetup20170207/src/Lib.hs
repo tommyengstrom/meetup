@@ -14,6 +14,7 @@ import           Control.Monad.IO.Class
 import           Data.Text              (Text)
 import           Data.Time
 
+type Endpoint = Either Text Task
 type UserId = Int
 type Task = Text
 
@@ -37,7 +38,7 @@ runMyMonad :: MyMonad a -> IO a
 runMyMonad (MyMonad m) = m
 
 -- Out pretend endopint: GET user/events
-taskEndpoint :: (MonadTime m, MonadDB m) => UserId -> m (Either Text Task)
+taskEndpoint :: (MonadTime m, MonadDB m) => UserId -> m Endpoint
 taskEndpoint userId = do
     workTime <- isWorkTime
     if workTime
@@ -47,4 +48,5 @@ taskEndpoint userId = do
 isWorkTime :: MonadTime m => m Bool
 isWorkTime = do
     time <- utctDayTime <$> getTime
-    return $ time > 8 * 3600 && time < 18 * 3600
+    return $ time > 8 * 3600
+          && time < 18 * 3600

@@ -12,17 +12,18 @@ main = do
     print result
 
 -- Out pretend endopint: GET user/events
-userTasksEndpoint :: UserId -> IO (Either Text Task)
+userTasksEndpoint :: UserId -> IO Endpoint
 userTasksEndpoint userId = do
     workTime <- isWorkTime
     if workTime
         then Right <$> getTaskFromDB userId
-        else return . Left $ "Time to go home!"
+        else return . Left $ "Go home!"
 
 isWorkTime :: IO Bool
 isWorkTime = do
     time <- utctDayTime <$> getCurrentTime
-    return $ time > 8 * 3600 && time < 18 * 3600
+    return $ time > 8 * 3600
+          && time < 18 * 3600
 
 -- Pretend this function talks to a database
 getTaskFromDB :: UserId -> IO Task

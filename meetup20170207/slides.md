@@ -1,56 +1,125 @@
-% MTL style stuff
-% Tommy Engström
-% 2017-02-07
 
-# MTL style stuff
-I will talk a bit
+![Henry](wordmark.svg)
+
+## Writing testable code
 
 ------
 
 
-``` haskell
--- Out pretend endopint: GET user/{user_id}/task
-userTasksEndpoint :: UserId -> IO (Either Text Task)
+``` Haskell
+-- Out pretend endopint: GET user/events
+userTasksEndpoint :: UserId -> IO Endpoint
 userTasksEndpoint userId = do
     workTime <- isWorkTime
     if workTime
         then Right <$> getTaskFromDB userId
-        else return . Left $ "Time to go home!"
+        else return . Left $ "Go home!"
 
 isWorkTime :: IO Bool
 isWorkTime = do
     time <- utctDayTime <$> getCurrentTime
-    return $ time > 8 * 3600 && time < 18 * 3600
-
--- Pretend this function talks to a database
-getTaskFromDB :: UserId -> IO Task
-getTaskFromDB _ = return  "Write some Haskell"
+    return $ time > 8 * 3600
+          && time < 18 * 3600
 ```
 
 
-# But how can we test this?
-`userTasksEndpoint` depends on database and time.
+### But how can we test this?
 
-* We must have a database containing tasks to write integration tests
-* If we write integration tests they will depend on what time you run the test
+### Typeclasses to the rescue!
 
-# Typeclasses to the rescue!
-why are we using typeclasses?
+### Defining your typeclasses
 
-# Defining your typeclasses
-code
+``` Haskell
+class Monad m => MonadTime m where
+    getTime :: m UTCTime
 
-# Writing your custom monad
-code
+class Monad m => MonadDB m where
+    getTask :: UserId -> m Task
 
-# New main
-code
+```
 
-# Defining a pure monad for testing
-code
+### Define our custom Monad
 
-# Writing some tests
-code
+``` Haskell
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-# Questions?
+newtype MyMonad a = MyMonad (IO a)
+    deriving ( Functor, Applicative, Monad
+             , MonadIO)
+```
+
+### Write instances
+
+``` Haskell
+instance MonadTime MyMonad where
+    getTime = liftIO getCurrentTime
+
+instance MonadDB MyMonad where
+    getTask _ = return "Write some Haskell"
+
+runMyMonad :: MyMonad a -> IO a
+runMyMonad (MyMonad m) = m
+
+```
+
+### Function to check time
+
+``` Haskell
+isWorkTime :: MonadTime m => m Bool
+isWorkTime = do
+    time <- utctDayTime <$> getTime
+    return $ time > 8 * 3600
+          && time < 18 * 3600
+```
+
+### New taskEndpoint
+
+``` Haskell
+-- Out pretend endopint: GET user/events
+taskEndpoint :: (MonadTime m, MonadDB m)
+             => UserId -> m Endpoint
+taskEndpoint userId = do
+    workTime <- isWorkTime
+    if workTime
+        then Right <$> getTask userId
+        else return . Left $ "Go home!"
+```
+
+### Defining a pure monad for testing
+``` Haskell
+newtype TestMonad a =
+    TestMonad (Reader UTCTime a)
+    deriving ( Functor, Applicative
+             , Monad
+             , MonadReader UTCTime)
+
+````
+
+### Write instances for TestMonad
+
+``` Haskell
+instance MonadTime TestMonad where
+    getTime = ask
+
+instance MonadDB TestMonad where
+    getTask _ = return "Test task"
+
+runTest :: UTCTime -> TestMonad a -> a
+runTest time (TestMonad m) =
+    runReader m time
+
+```
+
+### Test our implementation
+``` Haskell
+describe "Test task endpoint" $ do
+    it "Gives new task at 9:00" $
+        runTest (atHour 9)
+                (taskEndpoint userId)
+            `shouldSatisfy` not . null
+    it "Gives no new task at 19:00" $
+        runTest (atHour 19)
+                (taskEndpoint userId)
+            `shouldSatisfy` null
+```
 

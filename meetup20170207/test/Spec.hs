@@ -25,7 +25,10 @@ main :: IO ()
 main = hspec $
     describe "Test task endpoint" $ do
         it "Gives new task at 9:00" $
-            runTestMonad (atHour 9) (taskEndpoint userId) `shouldSatisfy`
+            runTestMonad
+                (atHour 9)
+                (taskEndpoint userId)
+                `shouldSatisfy`
                 not . null
         it "Gives no new task at 19:00" $
             runTestMonad (atHour 19) (taskEndpoint userId) `shouldSatisfy`
