@@ -236,7 +236,7 @@ isWorkTime <span class="fu">=</span> <span class="kw">do</span>
           <span class="fu">&amp;&amp;</span> time <span class="fu">&lt;</span> <span class="dv">18</span> <span class="fu">*</span> <span class="dv">3600</span></code></pre></div>
 </section><section id="new-taskendpoint" class="slide level3">
 <h3>New taskEndpoint</h3>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Out pretend endopint: GET user/events</span>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Out pretend endopint: GET user/tasks</span>
 <span class="ot">taskEndpoint ::</span> (<span class="dt">MonadTime</span> m, <span class="dt">MonadDB</span> m)
              <span class="ot">=&gt;</span> <span class="dt">UserId</span> <span class="ot">-&gt;</span> m <span class="dt">Endpoint</span>
 taskEndpoint userId <span class="fu">=</span> <span class="kw">do</span>

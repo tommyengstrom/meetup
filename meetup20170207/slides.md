@@ -75,7 +75,7 @@ isWorkTime = do
 ### New taskEndpoint
 
 ``` Haskell
--- Out pretend endopint: GET user/events
+-- Out pretend endopint: GET user/tasks
 taskEndpoint :: (MonadTime m, MonadDB m)
              => UserId -> m Endpoint
 taskEndpoint userId = do
